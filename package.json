@@ -5,6 +5,10 @@
   "repository": "https://github.com/ProgrammingHeroWC4/warehouse-management-server-side-0nahid",
   "author": "Naid Hassan Bulbul <nahidhassanbulbul@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "test": "nodemon index.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
