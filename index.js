@@ -33,6 +33,12 @@ async function connect() {
         res.send(product);
     });
 
+    // get api
+    app.get('/api/products', async (req, res) => {
+        const products = await productsCollections.find({}).toArray();
+        res.send(products);
+    });
+
 }
 connect().catch(console.dir);
 
