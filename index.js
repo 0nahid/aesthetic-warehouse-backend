@@ -18,12 +18,20 @@ async function connect() {
 
     // collections
     const carouselProductsCollections = client.db("warehouse").collection("products");
+    const productsCollections = client.db("shop").collection("products");
 
     // get api
     app.get('/api/carouselProducts', async (req, res) => {
         const products = await carouselProductsCollections.find({}).toArray();
         res.send(products);
     })
+
+    // post api 
+    app.post('/api/products', async (req, res) => {
+        const product = req.body;
+        await productsCollections.insertOne(product);
+        res.send(product);
+    });
 
 }
 connect().catch(console.dir);
