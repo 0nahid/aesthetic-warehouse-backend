@@ -54,6 +54,15 @@ async function connect() {
         res.json(result);
     });
 
+    // product update api
+    app.put('/api/products/:id', async (req, res) => {
+        const id = req.params.id;
+        const product = req.body;
+        const result = await productsCollections.updateOne({ _id: ObjectId(id) }, { $set: product });
+        res.json(result);
+    });
+
+
     // user collection post api 
     app.post('/api/users', async (req, res) => {
         const user = req.body;
