@@ -19,7 +19,7 @@ async function connect() {
     // collections
     const carouselProductsCollections = client.db("warehouse").collection("products");
     const productsCollections = client.db("shop").collection("products");
-    const userCollection = client.db("warehouse").collection("users");
+    const userCollection = client.db("shop").collection("users");
 
     // get api
     app.get('/api/carouselProducts', async (req, res) => {
@@ -45,6 +45,13 @@ async function connect() {
         const id = req.params.id;
         const product = await productsCollections.findOne({ _id: ObjectId(id) });
         res.send(product);
+    });
+
+    // product delete api 
+    app.delete('/api/products/:id', async (req, res) => {
+        const id = req.params.id;
+        const result = await productsCollections.deleteOne({ _id: ObjectId(id) });
+        res.json(result);
     });
 
     // user collection post api 
