@@ -55,6 +55,13 @@ async function connect() {
         res.send(user);
     });
 
+
+    // user collection get api
+    app.get('/api/users', async (req, res) => {
+        const users = await userCollection.find({}).toArray();
+        res.send(users);
+    });
+
 }
 connect().catch(console.dir);
 
