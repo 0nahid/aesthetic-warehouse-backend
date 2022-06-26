@@ -19,6 +19,7 @@ async function connect() {
     // collections
     const carouselProductsCollections = client.db("warehouse").collection("products");
     const productsCollections = client.db("shop").collection("products");
+    const userCollection = client.db("warehouse").collection("users");
 
     // get api
     app.get('/api/carouselProducts', async (req, res) => {
@@ -44,6 +45,14 @@ async function connect() {
         const id = req.params.id;
         const product = await productsCollections.findOne({ _id: ObjectId(id) });
         res.send(product);
+    });
+
+    // user collection post api 
+    app.post('/api/users', async (req, res) => {
+        const user = req.body;
+        console.log(user);
+        await userCollection.insertOne(user);
+        res.send(user);
     });
 
 }
