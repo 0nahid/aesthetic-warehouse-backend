@@ -13,17 +13,17 @@ const accessToken = process.env.JSW_ACCESS_TOKEN;
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).send({ message: "Unauthorized access" });
+        return res.status(401).send({ message: "Unauthorized access" });
     }
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-      if (err) {
-        return res.status(403).send({ message: "Forbidden access" });
-      }
-      req.decoded = decoded;
-      next();
+        if (err) {
+            return res.status(403).send({ message: "Forbidden access" });
+        }
+        req.decoded = decoded;
+        next();
     });
-  }
+}
 
 // Connect to MongoDB
 require('dotenv').config()
@@ -34,21 +34,34 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function connect() {
     await client.connect();
     console.log("Connected to MongoDB");
-    // jwt 
-    app.post('/login', async (req, res) => {
-        const user = req.body;
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRECT, {
-            expiresIn: '1d'
-        });
-        res.send({ accessToken });
-    })
-    
-    
+
     // collections
     const carouselProductsCollections = client.db("warehouse").collection("products");
     const productsCollections = client.db("shop").collection("products");
     const userCollection = client.db("shop").collection("users");
     const orderCollection = client.db("shop").collection("orders");
+
+    app.put("/user", async (req, res) => {
+        const user = req.body;
+        const filter = { email: user.email };
+        const options = { upsert: true };
+        const updateDoc = {
+            $set: user,
+        };
+        const result = await userCollection.updateOne(
+            filter,
+            updateDoc,
+            options
+        );
+        const token = jwt.sign(
+            { email: user.email },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "7d" }
+        );
+        res.send({ result, token });
+    });
+
+
 
     // get api
     app.get('/api/carouselProducts', async (req, res) => {
@@ -124,7 +137,7 @@ async function connect() {
         const orders = await orderCollection.find({ email: email }).toArray();
         res.send(orders);
     })
-    
+
 
 }
 connect().catch(console.dir);
