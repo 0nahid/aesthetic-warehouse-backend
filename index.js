@@ -6,6 +6,10 @@ const cors = require('cors')
 app.use(cors())
 app.use(express.json())
 
+//jwt 
+const jwt = require('jsonwebtoken');
+const accessToken = process.env.JSW_ACCESS_TOKEN;
+
 // Connect to MongoDB
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -15,7 +19,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function connect() {
     await client.connect();
     console.log("Connected to MongoDB");
-
+    // jwt 
+    app.post('/login', async (req, res) => {
+        const user = req.body;
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRECT, {
+            expiresIn: '1d'
+        });
+        res.send({ accessToken });
+    })
+    
+    
     // collections
     const carouselProductsCollections = client.db("warehouse").collection("products");
     const productsCollections = client.db("shop").collection("products");
@@ -98,6 +111,7 @@ async function connect() {
         // const orders = await orderCollection.find({}).toArray();
         res.send(orders);
     })
+    
 
 }
 connect().catch(console.dir);
