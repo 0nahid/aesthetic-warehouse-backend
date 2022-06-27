@@ -90,6 +90,15 @@ async function connect() {
         res.send(order);
     });
 
+    // order get api
+    app.get('/api/orders', async (req, res) => {
+        const email = req.query.email;
+        // console.log(email);
+        const orders = await orderCollection.find({ email: email }).toArray();
+        // const orders = await orderCollection.find({}).toArray();
+        res.send(orders);
+    })
+
 }
 connect().catch(console.dir);
 
