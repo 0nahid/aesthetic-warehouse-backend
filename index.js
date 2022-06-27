@@ -20,6 +20,7 @@ async function connect() {
     const carouselProductsCollections = client.db("warehouse").collection("products");
     const productsCollections = client.db("shop").collection("products");
     const userCollection = client.db("shop").collection("users");
+    const orderCollection = client.db("shop").collection("orders");
 
     // get api
     app.get('/api/carouselProducts', async (req, res) => {
@@ -79,6 +80,14 @@ async function connect() {
     app.get('/api/users', async (req, res) => {
         const users = await userCollection.find({}).toArray();
         res.send(users);
+    });
+
+    // order post api
+    app.post('/api/orders', async (req, res) => {
+        const order = req.body;
+        console.log(order);
+        await orderCollection.insertOne(order);
+        res.send(order);
     });
 
 }
