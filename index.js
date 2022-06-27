@@ -10,6 +10,21 @@ app.use(express.json())
 const jwt = require('jsonwebtoken');
 const accessToken = process.env.JSW_ACCESS_TOKEN;
 
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).send({ message: "Unauthorized access" });
+    }
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+      if (err) {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+      req.decoded = decoded;
+      next();
+    });
+  }
+
 // Connect to MongoDB
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -42,7 +57,7 @@ async function connect() {
     })
 
     // post api 
-    app.post('/api/products', async (req, res) => {
+    app.post('/api/products', verifyJWT, async (req, res) => {
         const product = req.body;
         await productsCollections.insertOne(product);
         res.send(product);
@@ -62,7 +77,7 @@ async function connect() {
     });
 
     // product delete api 
-    app.delete('/api/products/:id', async (req, res) => {
+    app.delete('/api/products/:id', verifyJWT, async (req, res) => {
         const id = req.params.id;
         const result = await productsCollections.deleteOne({ _id: ObjectId(id) });
         res.json(result);
@@ -96,7 +111,7 @@ async function connect() {
     });
 
     // order post api
-    app.post('/api/orders', async (req, res) => {
+    app.post('/api/product/order', async (req, res) => {
         const order = req.body;
         console.log(order);
         await orderCollection.insertOne(order);
@@ -106,9 +121,7 @@ async function connect() {
     // order get api
     app.get('/api/orders', async (req, res) => {
         const email = req.query.email;
-        // console.log(email);
         const orders = await orderCollection.find({ email: email }).toArray();
-        // const orders = await orderCollection.find({}).toArray();
         res.send(orders);
     })
     
