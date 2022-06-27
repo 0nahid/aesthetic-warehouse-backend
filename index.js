@@ -55,10 +55,13 @@ async function connect() {
     });
 
     // product update api
-    app.put('/api/products/:id', async (req, res) => {
+    app.patch('/api/products/:id', async (req, res) => {
         const id = req.params.id;
         const product = req.body;
-        const result = await productsCollections.updateOne({ _id: ObjectId(id) }, { $set: product });
+        const filter = { _id: ObjectId(id) };
+        const option = { upsert: true };
+        const updateDoc = { $set: product };
+        const result = await productsCollections.updateOne(filter, updateDoc, option);
         res.json(result);
     });
 
